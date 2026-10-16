@@ -33,17 +33,15 @@ export class WhatsAppService {
 
       const { state, saveCreds } = await useMultiFileAuthState('.whatsapp-session');
       
-      // --- CORREÇÃO PARA O ERRO 405 ---
-      // Força o uso de uma versão estável e compatível do WhatsApp Web.
-      // A versão [2, 3000, 1027934701] é conhecida por resolver o 405.
-      const WHATSAPP_VERSION: [number, number, number] = [2, 3000, 1027934701];
+      // Versão estável do protocolo WhatsApp Web para evitar erro 405
+      const WHATSAPP_VERSION: [number, number, number] = [2, 3000, 1048451567];
       
-     this.sock = makeWASocket({
-  version: [2, 3000, 1048451567], // Versão mais recente do WhatsApp Web
-  auth: state,
-  printQRInTerminal: false,
-  browser: ['Mac OS', 'Chrome', '14.4.1'], // <-- Alterado para macOS
-});
+      this.sock = makeWASocket({
+        version: WHATSAPP_VERSION,
+        auth: state,
+        printQRInTerminal: false,
+        browser: Browsers.macOS('Chrome'), // <-- Declara plataforma macOS
+      });
 
       // Handle connection updates
       this.sock.ev.on('connection.update', async (update) => {
