@@ -14,7 +14,7 @@ const envSchema = Joi.object({
   OPENAI_API_KEY: Joi.string().allow(''),
   OPENAI_MODEL: Joi.string().default('gpt-3.5-turbo'),
   GEMINI_API_KEY: Joi.string().allow(''),
-  GEMINI_MODEL: Joi.string().default('gemini-2.5-flash'), // <-- CORRIGIDO
+  GEMINI_MODEL: Joi.string().default('gemini-3.5-flash-lite'), // <-- CORRIGIDO
   MAX_HISTORY_LENGTH: Joi.number().default(50),
   RESPONSE_DELAY: Joi.number().default(1000),
   LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug').default('info'),
