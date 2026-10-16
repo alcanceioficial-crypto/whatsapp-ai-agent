@@ -10,11 +10,11 @@ dotenv.config();
  */
 const envSchema = Joi.object({
   PORT: Joi.number().default(3000),
-  AI_PROVIDER: Joi.string().valid('openai', 'gemini').default('openai'),
+  AI_PROVIDER: Joi.string().valid('openai', 'gemini').default('gemini'),
   OPENAI_API_KEY: Joi.string().allow(''),
   OPENAI_MODEL: Joi.string().default('gpt-3.5-turbo'),
   GEMINI_API_KEY: Joi.string().allow(''),
-  GEMINI_MODEL: Joi.string().default('gemini-pro'),
+  GEMINI_MODEL: Joi.string().default('gemini-2.5-flash'), // <-- CORRIGIDO
   MAX_HISTORY_LENGTH: Joi.number().default(50),
   RESPONSE_DELAY: Joi.number().default(1000),
   LOG_LEVEL: Joi.string().valid('error', 'warn', 'info', 'debug').default('info'),
@@ -37,7 +37,7 @@ const validateEnv = (): void => {
  */
 export const getAppConfig = (): AppConfig => {
   validateEnv();
-  const aiProvider = (process.env['AI_PROVIDER'] as AIProvider) || 'openai';
+  const aiProvider = (process.env['AI_PROVIDER'] as AIProvider) || 'gemini';
   return {
     port: parseInt(process.env['PORT'] || '3000', 10),
     aiProvider,
@@ -56,7 +56,7 @@ export const getAppConfig = (): AppConfig => {
  */
 export const getAIServiceConfig = (): AIServiceConfig => {
   validateEnv();
-  const provider = (process.env['AI_PROVIDER'] as AIProvider) || 'openai';
+  const provider = (process.env['AI_PROVIDER'] as AIProvider) || 'gemini';
   let apiKey = '';
   let model = '';
   if (provider === 'openai') {
@@ -64,7 +64,7 @@ export const getAIServiceConfig = (): AIServiceConfig => {
     model = process.env['OPENAI_MODEL'] || 'gpt-3.5-turbo';
   } else if (provider === 'gemini') {
     apiKey = process.env['GEMINI_API_KEY'] || '';
-    model = process.env['GEMINI_MODEL'] || 'gemini-pro';
+    model = process.env['GEMINI_MODEL'] || 'gemini-2.5-flash'; // <-- CORRIGIDO
   }
   return {
     provider,
@@ -88,4 +88,4 @@ export const isDevelopment = (): boolean => {
  */
 export const isProduction = (): boolean => {
   return process.env['NODE_ENV'] === 'production';
-}; 
+};
