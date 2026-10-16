@@ -38,12 +38,12 @@ export class WhatsAppService {
       // A versão [2, 3000, 1027934701] é conhecida por resolver o 405.
       const WHATSAPP_VERSION: [number, number, number] = [2, 3000, 1027934701];
       
-      this.sock = makeWASocket({
-        version: WHATSAPP_VERSION, // <-- Linha crucial
-        auth: state,
-        printQRInTerminal: false,
-        browser: Browsers.ubuntu('Chrome'), // Define um browser específico
-      });
+     this.sock = makeWASocket({
+  version: [2, 3000, 1048451567], // Versão mais recente do WhatsApp Web
+  auth: state,
+  printQRInTerminal: false,
+  browser: ['Mac OS', 'Chrome', '14.4.1'], // <-- Alterado para macOS
+});
 
       // Handle connection updates
       this.sock.ev.on('connection.update', async (update) => {
