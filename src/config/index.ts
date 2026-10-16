@@ -64,7 +64,7 @@ export const getAIServiceConfig = (): AIServiceConfig => {
     model = process.env['OPENAI_MODEL'] || 'gpt-3.5-turbo';
   } else if (provider === 'gemini') {
     apiKey = process.env['GEMINI_API_KEY'] || '';
-    model = process.env['GEMINI_MODEL'] || 'gemini-2.5-flash'; // <-- CORRIGIDO
+    model = process.env['GEMINI_MODEL'] || 'gemini-flash-latest'; // <-- CORRIGIDO
   }
   return {
     provider,
