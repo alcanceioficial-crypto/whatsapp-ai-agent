@@ -16,28 +16,23 @@ class WhatsAppAIChatbot {
     logger.info('WhatsApp AI Chatbot starting...');
   }
 
-  /**
-   * Initialize the application
-   */
   async initialize(): Promise<void> {
     try {
-      // Load configuration
       const appConfig = getAppConfig();
       const aiConfig = getAIServiceConfig();
 
       logger.info('Configuration loaded', {
         port: appConfig.port,
-        openaiModel: appConfig.openaiModel,
+        aiProvider: aiConfig.provider,
+        model: aiConfig.model, // <-- Log do modelo correto
         maxHistoryLength: appConfig.maxHistoryLength,
       });
 
-      // Initialize services
       const whatsappService = new WhatsAppService();
       const aiService = new AIService(aiConfig);
       const chatHistoryService = new ChatHistoryService(appConfig.maxHistoryLength);
       const webSocketService = new WebSocketService(appConfig.port);
 
-      // Create and initialize chatbot service
       this.chatbotService = new ChatbotService(
         whatsappService,
         aiService,
@@ -59,9 +54,6 @@ class WhatsAppAIChatbot {
     }
   }
 
-  /**
-   * Log startup information
-   */
   private logStartupInfo(): void {
     if (!this.chatbotService) return;
 
@@ -82,13 +74,9 @@ class WhatsAppAIChatbot {
     console.log('='.repeat(60) + '\n');
   }
 
-  /**
-   * Start the application
-   */
   async start(): Promise<void> {
     await this.initialize();
 
-    // Handle graceful shutdown
     process.on('SIGINT', async () => {
       logger.info('Received SIGINT, shutting down gracefully...');
       await this.shutdown();
@@ -101,7 +89,6 @@ class WhatsAppAIChatbot {
       process.exit(0);
     });
 
-    // Handle uncaught exceptions
     process.on('uncaughtException', (error) => {
       logger.error('Uncaught Exception', {
         error: error.message,
@@ -119,9 +106,6 @@ class WhatsAppAIChatbot {
     });
   }
 
-  /**
-   * Shutdown the application
-   */
   async shutdown(): Promise<void> {
     if (this.chatbotService) {
       await this.chatbotService.shutdown();
@@ -129,9 +113,6 @@ class WhatsAppAIChatbot {
     logger.info('Application shutdown completed');
   }
 
-  /**
-   * Get application status
-   */
   getStatus() {
     return this.chatbotService?.getStatus() || null;
   }
@@ -145,7 +126,6 @@ async function main(): Promise<void> {
   await app.start();
 }
 
-// Start the application
 if (require.main === module) {
   main().catch((error) => {
     logger.error('Application failed to start', {
@@ -155,4 +135,4 @@ if (require.main === module) {
   });
 }
 
-export { WhatsAppAIChatbot }; 
+export { WhatsAppAIChatbot };
