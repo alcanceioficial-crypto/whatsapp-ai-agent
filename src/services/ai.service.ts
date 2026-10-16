@@ -89,7 +89,15 @@ export class AIService {
         .map(m => `${m.role === 'user' ? 'User' : 'Bot'}: ${m.content}`)
         .join('\n');
       const prompt = `${this.config.systemPrompt}\n${context}\nUser: ${message}\nBot:`;
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.config.model}:generateContent?key=${this.config.apiKey}`;
+      
+      // CORREÇÃO: Usar um modelo válido do Gemini.
+      // 'gemini-pro' foi descontinuado e retorna erro 404.
+      // 'gemini-2.5-flash' é o modelo atual recomendado.
+      const modelName = this.config.model && this.config.model !== 'gemini-pro'
+        ? this.config.model
+        : 'gemini-2.5-flash';
+      
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${this.config.apiKey}`;
       const body = {
         contents: [
           {
@@ -117,7 +125,7 @@ export class AIService {
       const aiMessage = data.candidates?.[0]?.content?.parts?.[0]?.text || 'I apologize, but I cannot generate a response at the moment.';
       const aiResponse: AIResponse = {
         message: aiMessage,
-        confidence: 0.9, // Gemini does not provide a confidence score
+        confidence: 0.9,
         context: this.extractContext(chatHistory),
         timestamp: Date.now(),
       };
@@ -137,7 +145,6 @@ export class AIService {
   ): Array<{ role: 'user' | 'assistant'; content: string }> {
     const context: Array<{ role: 'user' | 'assistant'; content: string }> = [];
     
-    // Take last 10 messages for context (to avoid token limits)
     const recentHistory = chatHistory.slice(-10);
     
     for (const msg of recentHistory) {
@@ -156,18 +163,17 @@ export class AIService {
    * Calculate confidence score based on OpenAI response
    */
   private calculateConfidence(completion: any): number {
-    // Simple confidence calculation based on finish_reason
     const finishReason = completion.choices[0]?.finish_reason;
     
     switch (finishReason) {
       case 'stop':
-        return 0.9; // High confidence for complete responses
+        return 0.9;
       case 'length':
-        return 0.7; // Medium confidence for truncated responses
+        return 0.7;
       case 'content_filter':
-        return 0.5; // Lower confidence for filtered content
+        return 0.5;
       default:
-        return 0.6; // Default confidence
+        return 0.6;
     }
   }
 
@@ -177,7 +183,6 @@ export class AIService {
   private extractContext(chatHistory: WhatsAppMessage[]): string[] {
     const topics: string[] = [];
     
-    // Extract key topics from recent messages
     const recentMessages = chatHistory.slice(-5);
     
     for (const msg of recentMessages) {
@@ -189,7 +194,7 @@ export class AIService {
       });
     }
     
-    return topics.slice(0, 5); // Limit to 5 topics
+    return topics.slice(0, 5);
   }
 
   /**
@@ -247,7 +252,6 @@ export class AIService {
         return false;
       }
     } else {
-      // For Gemini, just check if API key is set
       if (this.config.apiKey) {
         logger.info('Gemini service connection test (API key present)');
         return true;
@@ -257,4 +261,4 @@ export class AIService {
       }
     }
   }
-} 
+}
